@@ -7,7 +7,7 @@ package.
 
 ## Installation
 ```
-pip install git+https://github.com/inlab-geo/pyrf96
+pip install git+https://github.com/inlab-geo/pyhk
 ```
 
 ## Documentation
