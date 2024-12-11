@@ -4,34 +4,35 @@ import os
 import glob
 
 # Locate the shared library in the same directory as this file
-#lib_path = os.path.join(os.path.dirname(__file__), "rf_lib*.so")
+# lib_path = os.path.join(os.path.dirname(__file__), "rf_lib*.so")
 
 
-#if not os.path.exists(lib_path):
+# if not os.path.exists(lib_path):
 #    raise FileNotFoundError(f"Shared library not found at {lib_path}")
 
 # Load the shared library
-#lib = ctypes.CDLL(lib_path)
+# lib = ctypes.CDLL(lib_path)
 
 lib = ctypes.cdll.LoadLibrary(glob.glob(os.path.dirname(__file__) + "/rf_lib*.so")[0])
 
 # Declare the C function signature
 lib.partial_modified.argtypes = [
-    ctypes.c_int,         # ps
-    ctypes.c_int,         # nft
-    ctypes.c_int,         # m
+    ctypes.c_int,  # ps
+    ctypes.c_int,  # nft
+    ctypes.c_int,  # m
     ctypes.POINTER(ctypes.c_float),  # thik
     ctypes.POINTER(ctypes.c_float),  # beta
     ctypes.POINTER(ctypes.c_float),  # kapa
-    ctypes.c_float,       # p
-    ctypes.c_float,       # dt
-    ctypes.c_float,       # gauss
-    ctypes.c_float,       # shft
-    ctypes.c_float,       # db
-    ctypes.c_float,       # dh
-    ctypes.POINTER(ctypes.c_float)   # result
+    ctypes.c_float,  # p
+    ctypes.c_float,  # dt
+    ctypes.c_float,  # gauss
+    ctypes.c_float,  # shft
+    ctypes.c_float,  # db
+    ctypes.c_float,  # dh
+    ctypes.POINTER(ctypes.c_float),  # result
 ]
 lib.partial_modified.restype = None
+
 
 def rfcalc(ps, thik, beta, kapa, p, duration, dt, gauss=5.0, shft=0.0, db=0.0, dh=0.0):
     # Convert Python inputs to C-compatible types
@@ -63,10 +64,20 @@ def rfcalc(ps, thik, beta, kapa, p, duration, dt, gauss=5.0, shft=0.0, db=0.0, d
 
     # Call the C function
     lib.partial_modified(
-        c_ps, c_nft, c_m, c_thik_ptr, c_beta_ptr, c_kapa_ptr,
-        c_p, ctypes.c_float(dt), c_gauss, c_shft, c_db, c_dh, c_result_ptr
+        c_ps,
+        c_nft,
+        c_m,
+        c_thik_ptr,
+        c_beta_ptr,
+        c_kapa_ptr,
+        c_p,
+        ctypes.c_float(dt),
+        c_gauss,
+        c_shft,
+        c_db,
+        c_dh,
+        c_result_ptr,
     )
 
     # Return the result as a NumPy array
     return result[:nft_valid]
-
