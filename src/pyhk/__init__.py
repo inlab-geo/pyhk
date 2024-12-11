@@ -1,2 +1,2 @@
-from ._pyhk import rf_calc
+from ._pyhk import rfcalc
 
