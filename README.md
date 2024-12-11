@@ -26,7 +26,7 @@ my_time_duration = 50
 my_time_sampling_interval = 0.1
 my_gauss = 1.0
 
-data_rf = pyhk.rf_calc(
+data_rf = pyhk.rfcalc(
     ps=0, 
     thik=my_model_thicknesses, 
     beta=my_model_vs, 
@@ -43,6 +43,7 @@ data_times = np.arange(data_rf.size) * my_time_sampling_interval - my_time_shift
 import matplotlib.pyplot as plt
 
 plt.scatter(data_times, data_rf)
+plt.show()
 ```
 
 
