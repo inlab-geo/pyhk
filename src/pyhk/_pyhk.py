@@ -81,3 +81,63 @@ def rfcalc(ps, thik, beta, kapa, p, duration, dt, gauss=5.0, shft=0.0, db=0.0, d
 
     # Return the result as a NumPy array
     return result[:nft_valid]
+
+# Declare the C function signature
+lib.respknt_modified.argtypes = [
+    ctypes.c_int,  # ps
+    ctypes.c_int,  # nft
+    ctypes.c_int,  # m
+    ctypes.POINTER(ctypes.c_float),  # thik
+    ctypes.POINTER(ctypes.c_float),  # beta
+    ctypes.POINTER(ctypes.c_float),  # kapa
+    ctypes.c_float,  # p
+    ctypes.c_float,  # dt
+    ctypes.POINTER(ctypes.c_float),  # result vertical
+    ctypes.POINTER(ctypes.c_float),   # result radial
+   ]
+lib.partial_modified.restype = None
+
+
+def respknt(ps,thik, beta, kapa, p, duration, dt):
+    # Convert Python inputs to C-compatible types
+    c_ps = ctypes.c_int(ps)
+    c_m = ctypes.c_int(len(thik))
+    c_p = ctypes.c_float(p)
+
+    # Use Python float values for arithmetic
+    nft_valid = int(duration / dt)
+    c_nft = 1
+    while c_nft < nft_valid:
+        c_nft *= 2
+    c_nft = ctypes.c_int(c_nft)
+
+    # Convert NumPy arrays to ctypes pointers
+    thik = np.array(thik, dtype=np.float32)
+    beta = np.array(beta, dtype=np.float32)
+    kapa = np.array(kapa, dtype=np.float32)
+    
+    result_vertical = np.zeros(c_nft.value, dtype=np.float32)
+    result_radial = np.zeros(c_nft.value, dtype=np.float32)
+
+    c_thik_ptr = thik.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
+    c_beta_ptr = beta.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
+    c_kapa_ptr = kapa.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
+    c_result_vertical_ptr = result_vertical.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
+    c_result_radial_ptr = result_radial.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
+
+    # Call the C function
+    lib.respknt_modified(
+        c_ps,
+        c_nft,
+        c_m,
+        c_thik_ptr,
+        c_beta_ptr,
+        c_kapa_ptr,
+        c_p,
+        ctypes.c_float(dt),
+        c_result_vertical_ptr,
+        c_result_radial_ptr
+    )
+    # Return the result as a NumPy array
+    return result_vertical[:nft_valid], result_radial[:nft_valid]
+

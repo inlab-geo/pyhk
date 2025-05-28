@@ -446,6 +446,49 @@ void	respknt(int		ps,	/* 0=incident P; 1=incident S */
   fftr(z, nft2, -dt);
 }
 
+/* calculate the radial and vertical displacement at free surface for P or S incident wave */
+void	respknt_modified(int		ps,	/* 0=incident P; 1=incident S */
+		int		nft,	/* number of pts for fft */
+		int		m,	/* number of input layers */
+		const float	thik[],	/* thickness */
+		const float	beta[], /* Vs */
+		const float	kapa[],	/* Vp/Vs */
+		float		p,	/* ray parameter */
+		float 		dt,	/* sampling interval */
+		//my_complex		z[],/* vertical response */
+		//my_complex		r[]	/* radial response */
+		float *arr_z,
+		float *arr_r
+	)
+{
+  int     	i, nft2, nlyrs;
+  float   	w, delw;
+  matrix  	aa;
+  Layer		*lyr;
+  my_complex *z = (my_complex *)arr_z;
+  my_complex *r = (my_complex *)arr_r;
+
+
+  nft2 = nft/2;
+  delw = 3.1415926/(dt*nft2);
+
+  lyr = mdSetup(m, thik, beta, kapa, 0., 0., &nlyrs);
+
+  ifmat(p, nlyrs, lyr);
+  for (i=0,w=0.; i<nft2; i++,w+=delw) {
+      aa = rcvrfn(w, nlyrs, lyr);
+      if (ps==0) {
+         r[i] = aa.sp;
+         z[i] = cmltp(IMAGE, aa.pp);
+      } else {
+         r[i] = aa.ss;
+         z[i] = cmltp(IMAGE, aa.ps);
+      }
+  }
+  fftr(r, nft2, -dt);
+  fftr(z, nft2, -dt);
+}
+
 
 /* read in model parameters and return number of layers read */
 int	mdin(const char *fo, float thik[], float beta[], float kapa[]) {

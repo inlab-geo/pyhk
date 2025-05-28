@@ -47,8 +47,40 @@ plt.scatter(data_times, data_rf)
 plt.show()
 ```
 
-### radial and vertical displacement at free surface for P or S incident wave
+### Radial and vertical displacement at free surface for P or S incident wave
 
+```python
+import pyhk
+import numpy as np
+
+my_model_thicknesses = [10, 20, 0]
+my_model_vs = [3.3, 3.4, 4.5]
+my_model_vp_vs_ratio = [1.732, 1.732, 1.732]
+my_ray_param_s_km = 0.07
+my_time_duration = 50
+my_time_sampling_interval = 0.1
+
+data_disp_vertical,data_disp_radial = pyhk.respknt(
+    ps=0, 
+    thik=my_model_thicknesses, 
+    beta=my_model_vs, 
+    kapa=my_model_vp_vs_ratio, 
+    p=my_ray_param_s_km, 
+    duration=my_time_duration, 
+    dt=my_time_sampling_interval, 
+)
+
+data_times = np.arange(data_disp_vertical.size) * my_time_sampling_interval 
+
+# if you'd like to visualise it
+import matplotlib.pyplot as plt
+
+plt.scatter(data_times, data_disp_vertical)
+plt.show()
+
+plt.scatter(data_times, data_disp_radial)
+plt.show()
+```
 
 ## Licensing
 The python wrapper for the original `hk` package is released as BSD-2-Clause licence
