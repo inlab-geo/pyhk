@@ -12,6 +12,7 @@ pip install git+https://github.com/inlab-geo/pyhk
 
 ## Documentation
 
+### Receiver funtion calculation
 
 ```python
 import pyhk
@@ -45,6 +46,8 @@ import matplotlib.pyplot as plt
 plt.scatter(data_times, data_rf)
 plt.show()
 ```
+
+### radial and vertical displacement at free surface for P or S incident wave
 
 
 ## Licensing
